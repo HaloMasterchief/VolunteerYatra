@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base layer: set global defaults but allow Tailwind utilities to override */
+@layer base {
+  :root {
+    --primary: #2563eb;
+    --secondary: #7c3aed;
+    --accent: #0ea5e9;
+    --background: #f8fafc;
+    --card: #ffffff;
+    --text: #1e293b;
+    --border: #e2e8f0;
+    --icon-size: 24px; /* New variable for icon size */
+  }
+
+  .dark {
+    --primary: #3b82f6;
+    --secondary: #8b5cf6;
+    --accent: #38bdf8;
+    --background: #0f172a;
+    --card: #1e293b;
+    --text: #f1f5f9;
+    --border: #334155;
+  }
+
+  body {
+    @apply bg-[var(--background)] text-[var(--text)] font-sans;
+  }
+}
+
+/* Components layer: reusable UI components */
+@layer components {
+  .container {
+    @apply mx-auto px-4 max-w-6xl;
+  }
+
+  .card {
+    @apply bg-card rounded-xl shadow-lg p-6 border border-border transition-all duration-300 hover:shadow-xl hover:border-primary/30;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-white font-medium py-2 px-4 rounded-lg transition-all duration-300 hover:bg-primary/90 active:scale-[0.98] flex items-center justify-center;
+  }
+
+  .tag {
+    @apply text-xs font-medium px-2.5 py-1 rounded-full bg-opacity-20;
+  }
+
+  .input-field {
+    @apply w-full p-3 rounded-lg border border-border bg-card focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors;
+  }
+
+  .icon {
+    @apply h-[var(--icon-size)] w-[var(--icon-size)] text-slate-400;
+  }
+
+  .icon-dark {
+    @apply h-[var(--icon-size)] w-[var(--icon-size)] text-slate-300;
+  }
+}
