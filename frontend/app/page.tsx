@@ -6,80 +6,83 @@ import "./globals.css";
 
 export default function Home() {
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
-const [searchTerm, setSearchTerm] = useState("");
-const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-const [applied, setApplied] = useState<number[]>([]);
-const [showSuggestions, setShowSuggestions] = useState(false);
+  const [applied, setApplied] = useState<number[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
-useEffect(() => {
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(
-        `http://localhost:5000/api/opportunities?search=${debouncedSearchTerm}`
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch opportunities");
-      }
-      const data = await response.json();
-      setOpportunities(data);
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("An unknown error occurred");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Use environment variable for API base URL
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
-  fetchData();
-}, [debouncedSearchTerm]);
-
-useEffect(() => {
-  const fetchSuggestions = async () => {
-    if (debouncedSearchTerm) {
+  useEffect(() => {
+    const fetchData = async () => {
       try {
+        setLoading(true);
         const response = await fetch(
-          `http://localhost:5000/api/suggestions?query=${debouncedSearchTerm}`
+          `${API_URL}/api/opportunities?search=${debouncedSearchTerm}`
         );
         if (!response.ok) {
-          throw new Error("Failed to fetch suggestions");
+          throw new Error("Failed to fetch opportunities");
         }
         const data = await response.json();
-        setSuggestions(data);
+        setOpportunities(data);
       } catch (err: unknown) {
         if (err instanceof Error) {
           setError(err.message);
         } else {
           setError("An unknown error occurred");
         }
+      } finally {
+        setLoading(false);
       }
-    } else {
-      setSuggestions([]);
-    }
-  };
+    };
 
-  fetchSuggestions();
-}, [debouncedSearchTerm]);
+    fetchData();
+  }, [debouncedSearchTerm, API_URL]);
 
-useEffect(() => {
-  const handler = setTimeout(() => {
-    setDebouncedSearchTerm(searchTerm);
-  }, 500);
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      if (debouncedSearchTerm) {
+        try {
+          const response = await fetch(
+            `${API_URL}/api/suggestions?query=${debouncedSearchTerm}`
+          );
+          if (!response.ok) {
+            throw new Error("Failed to fetch suggestions");
+          }
+          const data = await response.json();
+          setSuggestions(data);
+        } catch (err: unknown) {
+          if (err instanceof Error) {
+            setError(err.message);
+          } else {
+            setError("An unknown error occurred");
+          }
+        }
+      } else {
+        setSuggestions([]);
+      }
+    };
 
-  return () => {
-    clearTimeout(handler);
-  };
-}, [searchTerm]);
+    fetchSuggestions();
+  }, [debouncedSearchTerm, API_URL]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchTerm]);
 
   const handleApply = async (id: number) => {
     try {
-      const response = await fetch("http://localhost:5000/api/applications", {
+      const response = await fetch(`${API_URL}/api/applications`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
